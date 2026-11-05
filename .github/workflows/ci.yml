@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Tests (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run test suite
+        run: pytest -v
+
+      - name: Recompute the results tables from the committed predictions
+        run: |
+          shopt -s nullglob
+          for f in results/predictions_*.jsonl; do
+            python scripts/analyze.py "$f"
+          done
+
+  notebooks:
+    name: Notebook health
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check notebooks are valid JSON and their code parses
+        run: |
+          python - <<'PY'
+          import ast, glob, json, re, sys
+
+          MAGIC = re.compile(r"^\s*[%!].*$", re.M)
+          problems = []
+          for path in sorted(glob.glob("notebooks/**/*.ipynb", recursive=True)):
+              nb = json.load(open(path, encoding="utf-8"))
+              for i, cell in enumerate(nb.get("cells", [])):
+                  if cell.get("cell_type") == "code":
+                      source = "".join(cell.get("source", []))
+                      try:
+                          ast.parse(MAGIC.sub("pass", source))
+                      except SyntaxError as exc:
+                          problems.append(f"{path}: cell {i} does not parse ({exc.msg})")
+          if problems:
+              print("\n".join(problems))
+              sys.exit(1)
+          print("All notebooks OK.")
+          PY
