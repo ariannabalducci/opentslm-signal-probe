@@ -1,0 +1,56 @@
+{
+  "features": "per-axis mean and std stated in the prompt (6 numbers)",
+  "n_train": 68542,
+  "n_test": 8222,
+  "n_balanced_subset": 400,
+  "models": {
+    "majority class": {
+      "test_accuracy": 0.28484553636584775,
+      "test_macro_f1": 0.05542408178720182,
+      "subset_accuracy": 0.125,
+      "subset_macro_f1": 0.027777777777777776,
+      "per_class_recall_subset": {
+        "biking": 0.0,
+        "lying": 0.0,
+        "running": 0.0,
+        "sitting": 1.0,
+        "standing": 0.0,
+        "walking": 0.0,
+        "walking_down": 0.0,
+        "walking_up": 0.0
+      }
+    },
+    "logistic regression": {
+      "test_accuracy": 0.5325954755533934,
+      "test_macro_f1": 0.33023188685492755,
+      "subset_accuracy": 0.3525,
+      "subset_macro_f1": 0.27191331035974287,
+      "per_class_recall_subset": {
+        "biking": 0.0,
+        "lying": 0.0,
+        "running": 0.82,
+        "sitting": 0.66,
+        "standing": 0.52,
+        "walking": 0.72,
+        "walking_down": 0.1,
+        "walking_up": 0.0
+      }
+    },
+    "gradient boosting": {
+      "test_accuracy": 0.689491607881294,
+      "test_macro_f1": 0.6055568759875081,
+      "subset_accuracy": 0.5975,
+      "subset_macro_f1": 0.5859364658623368,
+      "per_class_recall_subset": {
+        "biking": 0.66,
+        "lying": 0.24,
+        "running": 0.82,
+        "sitting": 0.84,
+        "standing": 0.7,
+        "walking": 0.8,
+        "walking_down": 0.48,
+        "walking_up": 0.24
+      }
+    }
+  }
+}
