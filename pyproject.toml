@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "opentslm-signal-probe"
+version = "0.1.0"
+description = "Does OpenTSLM read the signal? A two-channel probe on HAR-CoT"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [{ name = "Arianna Balducci" }]
+keywords = ["time-series", "language-models", "evaluation", "shortcut-learning", "har"]
+dependencies = [
+    "numpy>=1.24",
+    "pandas>=2.0",
+]
+
+[project.optional-dependencies]
+baseline = ["scikit-learn>=1.3"]
+gpu = ["torch>=2.0"]  # plus OpenTSLM itself, installed from its repository (see README)
+dev = ["pytest>=7.4"]
+
+[tool.setuptools]
+packages = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --strict-markers"
