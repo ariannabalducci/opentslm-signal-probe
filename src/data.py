@@ -42,11 +42,25 @@ def channel_stats(signal):
     """Per-axis mean and std, computed as OpenTSLM does (float32, unbiased, clamped).
 
     Works on a single sample (3, T) or a stack (N, 3, T); reduces the last axis.
+
+    OpenTSLM reduces with torch. NumPy's float32 sums add the values in a
+    different order, so the last bits can differ, and about once in 250 samples
+    a mean that sits on a rounding boundary prints with a different fourth
+    decimal. When torch is installed (always on the GPU runs) the statistics are
+    therefore computed with the same torch operations; the NumPy fallback keeps
+    the CPU-only parts (tests, baseline) free of a torch dependency.
     """
     signal = np.asarray(signal, dtype=np.float32)
-    means = signal.mean(axis=-1)
-    stds = np.maximum(signal.std(axis=-1, ddof=1), np.float32(MIN_STD))
-    return means, stds
+    try:
+        import torch
+    except ImportError:
+        means = signal.mean(axis=-1)
+        stds = np.maximum(signal.std(axis=-1, ddof=1), np.float32(MIN_STD))
+        return means, stds
+    series = torch.from_numpy(np.ascontiguousarray(signal))
+    means = series.mean(dim=-1)
+    stds = torch.clamp(series.std(dim=-1), min=MIN_STD)
+    return means.numpy(), stds.numpy()
 
 
 def normalise(signal):
