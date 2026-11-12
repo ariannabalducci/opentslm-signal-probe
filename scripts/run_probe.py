@@ -126,7 +126,8 @@ def main():
     parser.add_argument("--per-class", default=50, type=int)
     parser.add_argument("--conditions", nargs="+", default=[c.name for c in CONDITIONS],
                         choices=[c.name for c in CONDITIONS])
-    parser.add_argument("--batch-size", default=8, type=int)
+    parser.add_argument("--batch-size", default=1, type=int,
+                        help="1 uses OpenTSLM's own generate; larger values must pass --check-batching")
     parser.add_argument("--max-new-tokens", default=400, type=int)
     parser.add_argument("--limit", default=None, type=int,
                         help="only the first N subset samples (smoke test)")

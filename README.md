@@ -69,10 +69,11 @@ Details that keep the comparison fair:
   verifies it against OpenTSLM's own dataset class before any run.
 * Shuffling uses one permutation for all three axes, so each time step keeps its
   3-D acceleration vector and the stated statistics remain true.
-* Generation is greedy. OpenTSLM's batched `generate` right-pads prompts of
-  different length, which is unsafe for a decoder-only model; the probe embeds
-  each sample separately and left-pads the batch itself, and checks that batched
-  and single-sample generation agree before trusting it.
+* Generation is greedy and runs one sample at a time through OpenTSLM's own
+  `generate`, the path its evaluation uses. A left-padded batched path is
+  available (`--batch-size N`) but has to pass `--check-batching` first: on
+  `llama-3.2-1b-har-sp` it did not (6 of 8 labels identical to single-sample
+  generation), so all reported results use `--batch-size 1`.
 * Answers are parsed like OpenTSLM's evaluation does; an unparseable answer counts
   as wrong and never as a prediction of some class.
 
