@@ -1,0 +1,8 @@
+condition,series,statistics,n,accuracy,macro_f1,unparsed,follows_signal,follows_text
+original,own,own,400,0.63,0.6114083054726431,0.0,,
+shuffled_time,shuffled,own,400,0.38,0.3148236282194849,0.0,,
+noise_signal,noise,own,400,0.3625,0.2977454505829792,0.0,,
+signal_from_other,donor,own,400,0.3875,0.3567899798343553,0.0,0.1525,0.3875
+stats_from_other,own,donor,400,0.175,0.1589896727132695,0.0,0.175,0.38
+no_stats,own,none,400,0.275,0.19146054847646166,0.0,,
+noise_no_stats,noise,none,400,0.125,0.027777777777777776,0.0,,
