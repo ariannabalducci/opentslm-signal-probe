@@ -4,6 +4,7 @@ Unparseable answers count as wrong, never as a prediction of some class: they
 add a false negative to the true class and no false positive anywhere. This is
 the same convention as OpenTSLM's own HAR evaluation with `allowed_labels`.
 """
+import math
 import re
 from collections import defaultdict
 
@@ -53,7 +54,9 @@ def macro_f1(predictions, references):
             continue  # label absent from both references and predictions
         denom = 2 * tp[label] + fp[label] + fn[label]
         scores.append(2 * tp[label] / denom)
-    return sum(scores) / len(scores) if scores else float("nan")
+    # fsum: exact, so the result is identical on every Python version (3.12 changed
+    # float sum() to compensated summation, which moved the last digit).
+    return math.fsum(scores) / len(scores) if scores else float("nan")
 
 
 def summarise(records, conditions):
