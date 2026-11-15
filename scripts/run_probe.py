@@ -109,14 +109,51 @@ def check_batching(model, samples, max_new_tokens):
 
 
 def already_done(path):
+    """(condition, index) pairs already in the output file.
+
+    A session that dies mid-write can leave a truncated last line: it is
+    dropped from the file (that sample is simply run again).
+    """
     done = set()
-    if path.exists():
-        with path.open(encoding="utf-8") as f:
-            for line in f:
-                if line.strip():
-                    r = json.loads(line)
-                    done.add((r["condition"], r["index"]))
+    if not path.exists():
+        return done
+    lines = path.read_text(encoding="utf-8").splitlines()
+    kept = []
+    for line in lines:
+        if not line.strip():
+            continue
+        try:
+            r = json.loads(line)
+        except json.JSONDecodeError:
+            print(f"Dropping a truncated line from {path.name}")
+            continue
+        kept.append(line)
+        done.add((r["condition"], r["index"]))
+    if len(kept) != len([x for x in lines if x.strip()]):
+        path.write_text("".join(k + "\n" for k in kept), encoding="utf-8")
     return done
+
+
+def provenance():
+    """Versions and hardware of the run, written into the manifest."""
+    import subprocess
+
+    def head(path):
+        try:
+            return subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=path,
+                                  capture_output=True, text=True, check=True).stdout.strip()
+        except (OSError, subprocess.CalledProcessError):
+            return None
+
+    import opentslm
+    import transformers
+    return {
+        "probe_commit": head(ROOT),
+        "opentslm_commit": head(Path(opentslm.__file__).resolve().parent),
+        "torch": torch.__version__,
+        "transformers": transformers.__version__,
+        "gpu": torch.cuda.get_device_name(0) if torch.cuda.is_available() else None,
+    }
 
 
 def main():
@@ -133,6 +170,8 @@ def main():
                         help="only the first N subset samples (smoke test)")
     parser.add_argument("--check-batching", action="store_true",
                         help="compare batched and single generation on one batch, then exit")
+    parser.add_argument("--trust-batching", action="store_true",
+                        help="allow --batch-size > 1 (only after --check-batching passed)")
     parser.add_argument("--out", default=None, type=Path)
     args = parser.parse_args()
 
@@ -148,7 +187,9 @@ def main():
 
     manifest = {
         "model": args.model, "per_class": args.per_class, "seed": SEED,
-        "max_new_tokens": args.max_new_tokens, "subset": subset.tolist(), "donors": donors.tolist(),
+        "max_new_tokens": args.max_new_tokens, "batch_size": args.batch_size,
+        **provenance(),
+        "subset": subset.tolist(), "donors": donors.tolist(),
     }
     out.with_suffix(".manifest.json").write_text(json.dumps(manifest, indent=1))
 
@@ -163,6 +204,10 @@ def main():
         ]
         ok = check_batching(model, samples, args.max_new_tokens)
         sys.exit(0 if ok else "Batched generation disagrees: rerun with --batch-size 1")
+
+    if args.batch_size > 1 and not args.trust_batching:
+        sys.exit("--batch-size > 1 needs --trust-batching, after --check-batching has passed "
+                 "for this model (it did not for llama-3.2-1b-har-sp)")
 
     done = already_done(out)
 

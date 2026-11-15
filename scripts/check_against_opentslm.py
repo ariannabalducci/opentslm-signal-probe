@@ -8,6 +8,8 @@ other condition is a controlled change of this input, so it has to match.
     python scripts/check_against_opentslm.py --data-dir ../OpenTSLM/src/data/har_cot
 """
 import argparse
+import json
+import subprocess
 import sys
 from pathlib import Path
 
@@ -24,6 +26,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--data-dir", default=ROOT / "data" / "raw", type=Path)
     parser.add_argument("-n", default=500, type=int)
+    parser.add_argument("--out", default=None, type=Path, help="also write the result as JSON")
     args = parser.parse_args()
 
     from opentslm.time_series_datasets.har_cot.HARCoTQADataset import HARCoTQADataset
@@ -43,9 +46,32 @@ def main():
                 print(f"sample {i}:\n  opentslm: {ref['time_series_text']}\n  probe:    {texts}")
         series_err = max(series_err, float(np.abs(np.asarray(ref["time_series"]) - series).max()))
 
-    print(f"Checked {min(args.n, len(labels))} samples: {text_mismatch} text mismatches, "
+    checked = min(args.n, len(labels))
+    print(f"Checked {checked} samples: {text_mismatch} text mismatches, "
           f"max series difference {series_err:.2e}")
+    if args.out:
+        import opentslm
+        import torch
+        record = {
+            "checked_samples": checked, "text_mismatches": text_mismatch,
+            "max_series_difference": series_err,
+            "probe_commit": _git_head(ROOT),
+            "opentslm_commit": _git_head(Path(opentslm.__file__).resolve().parent),
+            "torch": torch.__version__, "numpy": np.__version__, "python": sys.version.split()[0],
+        }
+        with args.out.open("w", encoding="utf-8", newline="\n") as f:
+            json.dump(record, f, indent=1)
+            f.write("\n")
+        print(f"Written to {args.out}")
     sys.exit(0 if text_mismatch == 0 and series_err < 1e-4 else 1)
+
+
+def _git_head(path):
+    try:
+        return subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=path, capture_output=True,
+                              text=True, check=True).stdout.strip()
+    except (OSError, subprocess.CalledProcessError):
+        return None
 
 
 if __name__ == "__main__":

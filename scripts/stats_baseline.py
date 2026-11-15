@@ -6,7 +6,10 @@ no series, no temporal information. If they score close to OpenTSLM, the text
 alone could carry most of the task, and the probe's swap conditions become the
 way to tell whether the model actually relies on it.
 
-Runs on a laptop in about a minute; needs only NumPy, pandas and scikit-learn.
+Runs on a laptop in about 20 s; needs NumPy, pandas and scikit-learn (pinned to
+1.7.2 in requirements.txt: newer releases change the gradient-boosting fit, e.g.
+1.9.1 gives 0.580 instead of 0.598 on the balanced subset). The library versions
+and whether the statistics were computed with torch are written to the output.
 
     python scripts/download_data.py
     python scripts/stats_baseline.py
@@ -30,6 +33,21 @@ sys.path.insert(0, str(ROOT))
 from src.config import LABELS, SEED  # noqa: E402
 from src.data import load_split, prompt_features  # noqa: E402
 from src.sampling import stratified_subset  # noqa: E402
+
+
+def library_versions():
+    import pandas
+    import sklearn
+    return {"python": sys.version.split()[0], "numpy": np.__version__,
+            "pandas": pandas.__version__, "scikit-learn": sklearn.__version__}
+
+
+def stats_backend():
+    try:
+        import torch
+    except ImportError:
+        return "numpy"
+    return f"torch {torch.__version__}"
 
 
 def main():
@@ -57,7 +75,10 @@ def main():
         "n_train": int(len(train_y)),
         "n_test": int(len(test_y)),
         "n_balanced_subset": int(len(subset)),
+        "library_versions": library_versions(),
+        "statistics_backend": stats_backend(),
         "models": {},
+        "subset_predictions": {},
     }
     for name, model in models.items():
         model.fit(f_train, train_y)
@@ -71,9 +92,13 @@ def main():
                 label: float(np.mean(pred[subset][test_y[subset] == label] == label)) for label in LABELS
             },
         }
+        # Per-sample predictions on the probe's subset, for the paired test in analyze.py.
+        results["subset_predictions"][name] = {str(int(i)): str(pred[i]) for i in subset}
 
     args.out.parent.mkdir(parents=True, exist_ok=True)
-    args.out.write_text(json.dumps(results, indent=2))
+    with args.out.open("w", encoding="utf-8", newline="\n") as f:
+        json.dump(results, f, indent=2)
+        f.write("\n")
 
     print(f"\nTrained on {len(train_y)} samples; six prompt numbers per sample.\n")
     print("| Classifier | Test accuracy | Test macro-F1 | Balanced subset accuracy | Balanced subset macro-F1 |")
@@ -81,7 +106,7 @@ def main():
     for name, r in results["models"].items():
         print(f"| {name} | {r['test_accuracy']:.3f} | {r['test_macro_f1']:.3f} "
               f"| {r['subset_accuracy']:.3f} | {r['subset_macro_f1']:.3f} |")
-    print(f"\nWritten to {args.out.relative_to(ROOT)}")
+    print(f"\nWritten to {args.out}")
 
 
 if __name__ == "__main__":

@@ -38,6 +38,29 @@ jobs:
             python scripts/analyze.py "$f"
           done
 
+      - name: Fail if the recomputed results differ from the committed ones
+        run: git diff --exit-code results/
+
+  torch-path:
+    name: Tests with CPU torch (statistics as OpenTSLM computes them)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+
+      - name: Run test suite
+        run: pytest -v
+
   notebooks:
     name: Notebook health
     runs-on: ubuntu-latest

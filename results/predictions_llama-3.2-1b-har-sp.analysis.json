@@ -1,0 +1,292 @@
+{
+ "chance_accuracy": 0.125,
+ "conditions": {
+  "no_stats": {
+   "accuracy": 0.275,
+   "correct": 110,
+   "macro_f1": 0.19146054847646166,
+   "n": 400,
+   "prediction_counts": {
+    "biking": 124,
+    "lying": 4,
+    "running": 8,
+    "sitting": 75,
+    "standing": 38,
+    "walking": 143,
+    "walking_down": 3,
+    "walking_up": 5
+   },
+   "unparsed": 0.0,
+   "wilson_95": [
+    0.23353872471100914,
+    0.3207418077394244
+   ]
+  },
+  "noise_no_stats": {
+   "accuracy": 0.125,
+   "correct": 50,
+   "macro_f1": 0.027777777777777776,
+   "n": 400,
+   "prediction_counts": {
+    "biking": 400
+   },
+   "unparsed": 0.0,
+   "wilson_95": [
+    0.09611512323676381,
+    0.1610190975139586
+   ]
+  },
+  "noise_signal": {
+   "accuracy": 0.3625,
+   "correct": 145,
+   "macro_f1": 0.2977454505829792,
+   "n": 400,
+   "prediction_counts": {
+    "biking": 190,
+    "lying": 25,
+    "running": 65,
+    "sitting": 88,
+    "standing": 26,
+    "walking": 6
+   },
+   "unparsed": 0.0,
+   "wilson_95": [
+    0.31690439607300025,
+    0.4107114848689313
+   ]
+  },
+  "original": {
+   "accuracy": 0.63,
+   "correct": 252,
+   "macro_f1": 0.6114083054726431,
+   "n": 400,
+   "prediction_counts": {
+    "biking": 50,
+    "lying": 17,
+    "running": 55,
+    "sitting": 98,
+    "standing": 47,
+    "walking": 94,
+    "walking_down": 19,
+    "walking_up": 20
+   },
+   "unparsed": 0.0,
+   "wilson_95": [
+    0.5816587842920732,
+    0.6758680191810097
+   ]
+  },
+  "shuffled_time": {
+   "accuracy": 0.38,
+   "correct": 152,
+   "macro_f1": 0.3148236282194849,
+   "n": 400,
+   "prediction_counts": {
+    "biking": 185,
+    "lying": 16,
+    "running": 64,
+    "sitting": 100,
+    "standing": 25,
+    "walking": 10
+   },
+   "unparsed": 0.0,
+   "wilson_95": [
+    0.3337874943779953,
+    0.4284954562622359
+   ]
+  },
+  "signal_from_other": {
+   "accuracy": 0.3875,
+   "correct": 155,
+   "macro_f1": 0.3567899798343553,
+   "n": 400,
+   "prediction_counts": {
+    "biking": 72,
+    "lying": 11,
+    "running": 65,
+    "sitting": 96,
+    "standing": 52,
+    "walking": 83,
+    "walking_down": 14,
+    "walking_up": 7
+   },
+   "unparsed": 0.0,
+   "wilson_95": [
+    0.34104299567214824,
+    0.43609727055306846
+   ]
+  },
+  "stats_from_other": {
+   "accuracy": 0.175,
+   "correct": 70,
+   "macro_f1": 0.1589896727132695,
+   "n": 400,
+   "prediction_counts": {
+    "biking": 66,
+    "lying": 12,
+    "running": 64,
+    "sitting": 93,
+    "standing": 57,
+    "walking": 87,
+    "walking_down": 7,
+    "walking_up": 14
+   },
+   "unparsed": 0.0,
+   "wilson_95": [
+    0.1409042015930453,
+    0.2152787897242474
+   ]
+  }
+ },
+ "pooled_by_statistics_class": {
+  "biking": {
+   "series": 12,
+   "statistics": 29
+  },
+  "lying": {
+   "series": 22,
+   "statistics": 10
+  },
+  "running": {
+   "series": 7,
+   "statistics": 73
+  },
+  "sitting": {
+   "series": 10,
+   "statistics": 74
+  },
+  "standing": {
+   "series": 10,
+   "statistics": 53
+  },
+  "walking": {
+   "series": 12,
+   "statistics": 45
+  },
+  "walking_down": {
+   "series": 27,
+   "statistics": 14
+  },
+  "walking_up": {
+   "series": 31,
+   "statistics": 9
+  }
+ },
+ "source": "predictions_llama-3.2-1b-har-sp.jsonl",
+ "swaps": {
+  "signal_from_other": {
+   "binomial_p_two_sided": 1.2742087441202338e-10,
+   "by_statistics_class": {
+    "biking": {
+     "series": 7,
+     "statistics": 15
+    },
+    "lying": {
+     "series": 12,
+     "statistics": 6
+    },
+    "running": {
+     "series": 2,
+     "statistics": 38
+    },
+    "sitting": {
+     "series": 2,
+     "statistics": 34
+    },
+    "standing": {
+     "series": 9,
+     "statistics": 25
+    },
+    "walking": {
+     "series": 8,
+     "statistics": 23
+    },
+    "walking_down": {
+     "series": 8,
+     "statistics": 11
+    },
+    "walking_up": {
+     "series": 13,
+     "statistics": 3
+    }
+   },
+   "chance_follows_series": 50.275,
+   "chance_follows_statistics": 50.0,
+   "follows_series": 61,
+   "follows_statistics": 155,
+   "n": 400,
+   "neither": 184,
+   "perm_p_follows_series_above_chance": 0.05909409059094091,
+   "perm_p_follows_statistics_above_chance": 9.999000099990002e-05
+  },
+  "stats_from_other": {
+   "binomial_p_two_sided": 3.84902372913886e-08,
+   "by_statistics_class": {
+    "biking": {
+     "series": 5,
+     "statistics": 14
+    },
+    "lying": {
+     "series": 10,
+     "statistics": 4
+    },
+    "running": {
+     "series": 5,
+     "statistics": 35
+    },
+    "sitting": {
+     "series": 8,
+     "statistics": 40
+    },
+    "standing": {
+     "series": 1,
+     "statistics": 28
+    },
+    "walking": {
+     "series": 4,
+     "statistics": 22
+    },
+    "walking_down": {
+     "series": 19,
+     "statistics": 3
+    },
+    "walking_up": {
+     "series": 18,
+     "statistics": 6
+    }
+   },
+   "chance_follows_series": 50.0,
+   "chance_follows_statistics": 50.3575,
+   "follows_series": 70,
+   "follows_statistics": 152,
+   "n": 400,
+   "neither": 178,
+   "perm_p_follows_series_above_chance": 0.0013998600139986002,
+   "perm_p_follows_statistics_above_chance": 9.999000099990002e-05
+  }
+ },
+ "vs_baseline": {
+  "gradient boosting": {
+   "classifier_accuracy": 0.5975,
+   "mcnemar_p": 0.14803218069275836,
+   "model_accuracy": 0.63,
+   "only_classifier_right": 28,
+   "only_model_right": 41,
+   "same_label_share": 0.75
+  },
+  "library_versions": {
+   "numpy": "2.5.4",
+   "pandas": "3.1.1",
+   "python": "3.13.15",
+   "scikit-learn": "1.7.2"
+  },
+  "logistic regression": {
+   "classifier_accuracy": 0.355,
+   "mcnemar_p": 1.239372500768143e-23,
+   "model_accuracy": 0.63,
+   "only_classifier_right": 13,
+   "only_model_right": 123,
+   "same_label_share": 0.57
+  }
+ }
+}
